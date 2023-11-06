@@ -1,0 +1,45 @@
+import { DOCUMENT } from '@angular/common';
+import { Directive,OnInit,ElementRef,Inject,HostListener } from '@angular/core';
+
+@Directive({
+  selector: '[elasticInput]'
+})
+export class ElasticInputDirective implements OnInit{
+  dummyEl: any ;
+
+  @HostListener("input", ["$event.target"])
+  onInput(e:any): void {
+    this.update();
+  }
+  constructor(
+    private el: ElementRef,
+    @Inject(DOCUMENT) private document: Document
+  ) {}
+
+  ngOnInit(): void {
+    this.dummyEl = this.document.createElement("div");
+    this.dummyEl.style.position = "fixed";
+    this.dummyEl.style.top = "-999px";
+    this.dummyEl.style.left = "0";
+    this.document.body.appendChild(this.dummyEl);
+    this.update();
+  }
+  ngAfterViewChecked(): void {
+    this.update();
+  }
+
+  ngOnDestroy(): void {
+    this.dummyEl.remove();
+  }
+
+  update(): void {
+    this.dummyEl.innerText =
+      this.el.nativeElement.value || this.el.nativeElement.placeholder;
+    this.el.nativeElement.style.width = `${this.dummyEl.clientWidth + 20}px`;
+  }
+}
+
+=================================================
+
+
+<input type="text" elasticInput placeholder="Type...">
